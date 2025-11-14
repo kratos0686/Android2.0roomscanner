@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -42,7 +43,7 @@ class FirebaseService {
   // Upload scan file to Storage
   Future<String> uploadScanFile(String filePath, String fileName) async {
     final ref = _storage.ref().child('scans/${_auth.currentUser?.uid}/$fileName');
-    final uploadTask = await ref.putFile(File(filePath) as File);
+    final uploadTask = await ref.putFile(File(filePath));
     return await uploadTask.ref.getDownloadURL();
   }
 
@@ -54,9 +55,4 @@ class FirebaseService {
         .orderBy('timestamp', descending: true)
         .snapshots();
   }
-}
-
-class File {
-  final String path;
-  File(this.path);
 }
