@@ -1,0 +1,35 @@
+name: room_scanner
+description: A Flutter 3D room scanner application with Firebase integration
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Firebase packages
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  firebase_storage: ^12.3.4
+  cloud_firestore: ^5.4.4
+  firebase_analytics: ^11.3.3
+  
+  # UI and utilities
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.2
+  
+  # Camera and AR for 3D scanning
+  camera: ^0.11.0+2
+  arcore_flutter_plugin: ^0.1.0
+  arkit_plugin: ^1.0.7
+  
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

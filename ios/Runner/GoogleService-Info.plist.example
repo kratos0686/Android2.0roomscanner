@@ -1,0 +1,11 @@
+# This is a placeholder for GoogleService-Info.plist
+# 
+# To set up Firebase for iOS:
+# 1. Go to Firebase Console: https://console.firebase.google.com/
+# 2. Select your project
+# 3. Go to Project Settings > Your apps
+# 4. Select your iOS app or add a new one
+# 5. Download GoogleService-Info.plist
+# 6. Place the downloaded file in ios/Runner/ directory
+# 
+# Bundle ID should be: com.roomscanner.app
