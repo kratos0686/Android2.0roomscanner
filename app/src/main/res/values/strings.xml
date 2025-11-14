@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AR Room Scanner</string>
+    <string name="scan_button">Start Scan</string>
+    <string name="stop_button">Stop Scan</string>
+    <string name="ar_not_supported">ARCore is not supported on this device</string>
+    <string name="camera_permission_required">Camera permission is required for AR scanning</string>
+    <string name="scanning_status">Scanning...</string>
+    <string name="scan_complete">Scan Complete</string>
+    <string name="ml_model_loading">Loading ML model...</string>
+</resources>
