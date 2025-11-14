@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Room Scanner</string>
+    <string name="welcome_message">Welcome to 3D Room Scanner</string>
+</resources>
