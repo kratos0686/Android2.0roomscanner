@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Room Scanner</string>
+    <string name="scan_room">Scan Room</string>
+    <string name="view_scans">View Scans</string>
+    <string name="settings">Settings</string>
+    <string name="sync">Sync</string>
+    <string name="add_note">Add Note</string>
+    <string name="generate_plan">Generate Drying Plan</string>
+</resources>
