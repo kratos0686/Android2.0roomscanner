@@ -1,1 +1,0 @@
-// Sample ViewModel using RxJava
