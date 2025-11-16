@@ -2,6 +2,29 @@
 
 A modern Android application for 3D room scanning using ARCore, with offline storage, ML-powered analysis, and cloud synchronization.
 
+## 🚀 Quick Start - Launch the App
+
+**Ready to launch?** Follow these steps:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/kratos0686/Android2.0roomscanner.git
+   cd Android2.0roomscanner
+   ```
+
+2. **Open in Android Studio:**
+   - Open Android Studio
+   - Select "Open an Existing Project"
+   - Navigate to the cloned directory
+
+3. **Build and Run:**
+   - Click the Run button (▶️) or press Shift+F10
+   - Select your Android device or emulator
+   
+**For detailed launch instructions, see [LAUNCH_GUIDE.md](LAUNCH_GUIDE.md)**
+
+---
+
 ## Features
 
 ### 🏠 ARCore 3D Scanning
@@ -71,6 +94,8 @@ See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture documentat
 - Google account for Firebase setup
 
 ## Setup Instructions
+
+> **📖 Comprehensive Launch Guide:** See [LAUNCH_GUIDE.md](LAUNCH_GUIDE.md) for detailed step-by-step instructions, troubleshooting, and device requirements.
 
 ### 1. Clone the Repository
 
