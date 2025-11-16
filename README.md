@@ -1,163 +1,364 @@
-# Android AR Room Scanner
+# Room Scanner - Android 3D Room Scanning App
 
-An Android application for 3D room scanning using ARCore and Machine Learning.
+A modern Android application for 3D room scanning using ARCore, with offline storage, ML-powered analysis, and cloud synchronization.
 
-## Overview
+## 🚀 Quick Start - Launch the App
 
-This AR Room Scanner application uses Google's ARCore to scan and map indoor spaces in 3D. It leverages TensorFlow Lite for on-device machine learning to process and analyze the scanned environment.
+**Ready to launch?** Follow these steps:
 
-## Features
-
-- **ARCore Integration**: Real-time AR tracking and environment understanding
-- **Point Cloud Capture**: Captures 3D point cloud data from the environment
-- **ML Model Support**: TensorFlow Lite model integration for enhanced scene understanding
-- **Modern UI**: Built with Jetpack Compose for a reactive, modern Android UI
-- **Camera Permissions**: Automatic camera permission handling
-- **ARCore Compatibility Check**: Validates device support before running
-
-## Project Structure
-
-```
-ARRoomScannerApp/
-├── app/
-│   ├── build.gradle                    # App-level build configuration
-│   ├── proguard-rules.pro             # ProGuard rules for code obfuscation
-│   └── src/
-│       └── main/
-│           ├── AndroidManifest.xml     # App manifest with AR permissions
-│           ├── java/com/example/arroomscanner/
-│           │   ├── MainActivity.kt      # Main entry point with permission handling
-│           │   ├── ScannerViewModel.kt  # ViewModel for AR session management
-│           │   └── ScannerScreen.kt     # Compose UI for AR scanning interface
-│           ├── res/
-│           │   ├── layout/             # Layout resources
-│           │   ├── values/             # String, color, and theme resources
-│           │   ├── drawable/           # Drawable resources
-│           │   └── mipmap-*/           # App launcher icons
-│           ├── assets/                 # Application assets
-│           └── ml/                     # TensorFlow Lite ML models (*.tflite)
-├── build.gradle                        # Project-level build configuration
-├── settings.gradle                     # Project settings
-└── gradlew                            # Gradle wrapper script
-```
-
-## Requirements
-
-- **Android Studio**: Arctic Fox (2020.3.1) or newer
-- **Minimum SDK**: API 24 (Android 7.0 Nougat)
-- **Target SDK**: API 34 (Android 14)
-- **ARCore**: Device must support ARCore
-- **Camera**: Device must have a camera
-
-## Setup Instructions
-
-1. **Clone the repository**:
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/kratos0686/Android2.0roomscanner.git
    cd Android2.0roomscanner
    ```
 
-2. **Open in Android Studio**:
+2. **Open in Android Studio:**
    - Open Android Studio
    - Select "Open an Existing Project"
-   - Navigate to the cloned repository
+   - Navigate to the cloned directory
 
-3. **Sync Gradle**:
-   - Android Studio will automatically start syncing Gradle
-   - Wait for the sync to complete
+3. **Build and Run:**
+   - Click the Run button (▶️) or press Shift+F10
+   - Select your Android device or emulator
+   
+**For detailed launch instructions, see [LAUNCH_GUIDE.md](LAUNCH_GUIDE.md)**
 
-4. **Add ML Models** (Optional):
-   - Place your TensorFlow Lite models (`.tflite` files) in `app/src/main/ml/`
-   - Android Studio will automatically generate Kotlin bindings for the models
-   - Update `ScannerViewModel.kt` to load and use your specific models
+---
 
-5. **Run the App**:
-   - Connect an ARCore-compatible Android device
-   - Click the "Run" button in Android Studio
-   - Grant camera permissions when prompted
+## Features
 
-## Key Dependencies
+### 🏠 ARCore 3D Scanning
+- Real-time 3D room scanning
+- Automatic plane detection (floors, walls, ceilings)
+- Room dimension extraction
+- Point cloud data capture
+- Mesh data generation
 
-- **ARCore**: `com.google.ar:core:1.40.0` - Google's AR platform
-- **TensorFlow Lite**: `org.tensorflow:tensorflow-lite:2.13.0` - On-device ML inference
-- **Jetpack Compose**: Modern declarative UI framework
-- **CameraX**: Camera access and control
-- **AndroidX Core**: Core Android libraries
+### 🗄️ Offline Storage with Room Database
+- Local SQLite database for offline-first architecture
+- Store scan data and job notes
+- Support for Kotlin Coroutines and RxJava
+- Automatic backup configuration
+- Foreign key relationships and cascading deletes
 
-## Usage
+### 🤖 ML Kit & TensorFlow Lite Integration
+- Object detection in room scans
+- Image labeling for material identification
+- Custom TFLite models for damage detection
+- GPU/NNAPI acceleration support
+- On-device inference for privacy
 
-1. Launch the app on an ARCore-compatible device
-2. Grant camera permissions when prompted
-3. Point the camera at the room you want to scan
-4. Tap "Start Scan" to begin capturing the environment
-5. Move the device slowly to capture different angles
-6. The app will collect point cloud data and process it with ML models
-7. Tap "Stop Scan" when finished
+### ☁️ Firebase Integration
+- **Firestore**: Cloud database sync
+- **Cloud Functions**: Serverless processing (report generation, cost estimation)
+- **Storage**: Upload point clouds, mesh data, and images
+- **ML Model Download**: Dynamic model updates
 
-## Adding ML Models
+### 📝 Job Notes & Annotations
+- Add notes to specific locations in scans
+- Categorize notes (damage, measurements, materials)
+- Offline storage with cloud sync
+- Position tracking in 3D space
 
-To add custom TensorFlow Lite models:
+### 🎨 Modern UI with Jetpack Compose
+- Material Design 3
+- Reactive UI updates
+- Navigation between screens
+- Responsive layouts
 
-1. Place your `.tflite` model file in `app/src/main/ml/`
-2. Android Studio will generate a model class automatically
-3. In `ScannerViewModel.kt`, modify the `loadMLModel()` function:
-   ```kotlin
-   private fun loadMLModel() {
-       viewModelScope.launch {
-           try {
-               val model = YourModel.newInstance(context)
-               _mlModelLoaded.value = true
-           } catch (e: Exception) {
-               _scanningState.value = ScanningState.Error("Failed to load ML model: ${e.message}")
-           }
-       }
-   }
-   ```
+### ⚡ Reactive Programming
+- RxJava 3 support for reactive streams
+- Kotlin Coroutines and Flow
+- Seamless integration between both paradigms
 
 ## Architecture
 
-The app follows the MVVM (Model-View-ViewModel) architecture pattern:
+The app follows a clean, layered architecture:
 
-- **MainActivity**: Entry point, handles permissions and initializes the UI
-- **ScannerViewModel**: Manages AR session state, point cloud data, and ML model inference
-- **ScannerScreen**: Compose UI that observes ViewModel state and provides user controls
+```
+UI Layer (Compose) → ViewModel → Repository → Data Sources
+                                              ├─ Room DB (Local)
+                                              ├─ Firebase (Cloud)
+                                              ├─ ML Kit
+                                              └─ ARCore
+```
 
-## Permissions
+See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture documentation.
 
-The app requires the following permissions:
-- `android.permission.CAMERA` - Required for AR tracking
+## Prerequisites
 
-## ARCore Features Used
+- Android Studio Arctic Fox or later
+- Android device with ARCore support ([check compatibility](https://developers.google.com/ar/devices))
+- Android 7.0 (API level 24) or higher
+- Camera permissions
+- Google account for Firebase setup
 
-- **Motion Tracking**: Track device position and orientation
-- **Environmental Understanding**: Detect horizontal and vertical surfaces
-- **Depth API**: Automatic depth mode for enhanced scene understanding
-- **Point Cloud**: Capture 3D point data from the environment
+## Setup Instructions
+
+> **📖 Comprehensive Launch Guide:** See [LAUNCH_GUIDE.md](LAUNCH_GUIDE.md) for detailed step-by-step instructions, troubleshooting, and device requirements.
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/kratos0686/Android2.0roomscanner.git
+cd Android2.0roomscanner
+```
+
+### 2. Firebase Setup
+
+1. Create a Firebase project in [Firebase Console](https://console.firebase.google.com/)
+2. Add an Android app with package name `com.roomscanner.app`
+3. Download `google-services.json` and place it in `app/` directory
+4. Enable Firestore, Storage, and Cloud Functions
+
+See [FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md) for detailed Firebase configuration.
+
+### 3. Build the Project
+
+```bash
+./gradlew build
+```
+
+### 4. Run on Device
+
+1. Enable Developer Options on your Android device
+2. Enable USB Debugging
+3. Connect device via USB
+4. Run from Android Studio or:
+
+```bash
+./gradlew installDebug
+```
+
+## Project Structure
+
+```
+app/
+├── src/main/java/com/roomscanner/app/
+│   ├── data/
+│   │   ├── entity/          # Room entities (ScanEntity, NoteEntity)
+│   │   ├── dao/             # Data Access Objects
+│   │   ├── repository/      # Repository layer
+│   │   └── AppDatabase.kt   # Room database
+│   ├── arcore/              # ARCore integration
+│   │   ├── ARCoreSessionManager.kt
+│   │   └── ScanDataProcessor.kt
+│   ├── ml/                  # Machine Learning
+│   │   ├── MLKitDetector.kt
+│   │   └── TFLiteModelRunner.kt
+│   ├── firebase/            # Firebase integration
+│   │   ├── FirestoreSync.kt
+│   │   ├── CloudFunctionsClient.kt
+│   │   └── StorageManager.kt
+│   ├── ui/                  # UI components
+│   │   └── theme/
+│   └── MainActivity.kt      # Main activity
+├── src/main/res/
+│   ├── values/
+│   ├── xml/
+│   └── ...
+└── build.gradle.kts
+
+docs/                        # Documentation
+├── ARCHITECTURE.md          # Architecture overview
+├── ROOM_DATABASE.md         # Room DB integration guide
+├── FIREBASE_SETUP.md        # Firebase setup guide
+├── ARCORE_INTEGRATION.md    # ARCore integration guide
+└── TFLITE_DEPLOYMENT.md     # TFLite model deployment guide
+```
+
+## Key Components
+
+### Room Database
+
+Offline-first storage for scan data:
+
+```kotlin
+@Entity(tableName = "scans")
+data class ScanEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val roomName: String,
+    val length: Float,
+    val width: Float,
+    val height: Float,
+    val pointCloudPath: String?,
+    val isSynced: Boolean = false
+)
+```
+
+See [ROOM_DATABASE.md](docs/ROOM_DATABASE.md) for detailed usage.
+
+### ARCore Integration
+
+3D scanning with ARCore:
+
+```kotlin
+val sessionManager = ARCoreSessionManager(context)
+val session = sessionManager.createSession()
+
+val frame = session.update()
+val dimensions = dataProcessor.extractRoomDimensions(frame)
+```
+
+See [ARCORE_INTEGRATION.md](docs/ARCORE_INTEGRATION.md) for detailed integration.
+
+### ML Kit
+
+Object detection and image labeling:
+
+```kotlin
+val mlKit = MLKitDetector(context)
+val objects = mlKit.detectObjects(bitmap)
+val labels = mlKit.labelImage(bitmap)
+```
+
+### TensorFlow Lite
+
+Custom model inference:
+
+```kotlin
+val modelRunner = TFLiteModelRunner(context)
+modelRunner.loadModel("damage_detector.tflite")
+val damage = modelRunner.detectDamage(bitmap)
+```
+
+See [TFLITE_DEPLOYMENT.md](docs/TFLITE_DEPLOYMENT.md) for model deployment.
+
+### Firebase Sync
+
+Cloud synchronization:
+
+```kotlin
+val firestoreSync = FirestoreSync()
+val firebaseId = firestoreSync.uploadScan(scan)
+
+val cloudFunctions = CloudFunctionsClient()
+val report = cloudFunctions.generatePDFReport(scanId)
+```
+
+See [FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md) for setup and usage.
+
+## Usage Examples
+
+### Creating a Scan
+
+```kotlin
+viewModelScope.launch {
+    val scan = ScanEntity(
+        roomName = "Living Room",
+        length = 5.0f,
+        width = 4.0f,
+        height = 2.5f
+    )
+    val scanId = repository.insertScan(scan)
+}
+```
+
+### Adding Notes
+
+```kotlin
+viewModelScope.launch {
+    val note = NoteEntity(
+        scanId = scanId,
+        title = "Damage Found",
+        content = "Water damage on north wall",
+        category = "damage"
+    )
+    repository.insertNote(note)
+}
+```
+
+### Observing Data with Flow
+
+```kotlin
+repository.getAllScans()
+    .collect { scans ->
+        // Update UI with scans
+    }
+```
+
+### Observing Data with RxJava
+
+```kotlin
+repository.getAllScansRx()
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe { scans ->
+        // Update UI with scans
+    }
+```
+
+## Documentation
+
+Comprehensive guides are available in the `docs/` directory:
+
+- **[Architecture Overview](docs/ARCHITECTURE.md)** - System design and component responsibilities
+- **[Room Database Integration](docs/ROOM_DATABASE.md)** - Local storage guide
+- **[Firebase Setup](docs/FIREBASE_SETUP.md)** - Cloud services configuration
+- **[ARCore Integration](docs/ARCORE_INTEGRATION.md)** - 3D scanning implementation
+- **[TFLite Deployment](docs/TFLITE_DEPLOYMENT.md)** - ML model deployment and optimization
+
+## Dependencies
+
+Key dependencies used in this project:
+
+- **Jetpack Compose** - Modern UI toolkit
+- **Room** - Local database
+- **ARCore** - 3D scanning
+- **ML Kit** - Object detection and labeling
+- **TensorFlow Lite** - Custom ML models
+- **Firebase** - Cloud services (Firestore, Functions, Storage)
+- **RxJava 3** - Reactive programming
+- **Kotlin Coroutines** - Asynchronous programming
+
+See [build.gradle.kts](app/build.gradle.kts) for complete dependency list.
+
+## Testing
+
+Run tests:
+
+```bash
+# Unit tests
+./gradlew test
+
+# Instrumentation tests
+./gradlew connectedAndroidTest
+```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a Pull Request.
+
+### For Human Contributors
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines
+- Follow the code style and conventions outlined in the guide
+- Write tests for new features and bug fixes
+
+### For GitHub Copilot Coding Agent
+- See [.github/copilot-instructions.md](.github/copilot-instructions.md) for repository context and guidelines
+- Follow the contribution workflow and best practices specified there
 
 ## License
 
-This project is open source and available under the MIT License.
+This project is licensed under the MIT License.
 
-## Troubleshooting
+## Resources
 
-### ARCore Not Supported
-- Ensure your device is on the [ARCore supported devices list](https://developers.google.com/ar/devices)
-- Update Google Play Services for AR
+- [ARCore Developer Guide](https://developers.google.com/ar/develop)
+- [Room Database Documentation](https://developer.android.com/training/data-storage/room)
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [ML Kit Documentation](https://developers.google.com/ml-kit)
+- [TensorFlow Lite Guide](https://www.tensorflow.org/lite)
+- [Jetpack Compose](https://developer.android.com/jetpack/compose)
 
-### Camera Permission Denied
-- Go to Settings > Apps > AR Room Scanner > Permissions
-- Enable Camera permission
+## Support
 
-### Build Errors
-- Ensure you have the latest Android Studio version
-- Sync Gradle files: File > Sync Project with Gradle Files
-- Clean and rebuild: Build > Clean Project, then Build > Rebuild Project
+For issues, questions, or contributions, please open an issue on GitHub.
 
-## Contact
+## Acknowledgments
 
-For questions or support, please open an issue on GitHub.
-
+- Google ARCore team for 3D scanning capabilities
+- Firebase team for cloud services
+- TensorFlow team for ML frameworks
+- Android Jetpack team for modern development tools
