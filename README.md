@@ -328,7 +328,16 @@ Run tests:
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a Pull Request.
+
+### For Human Contributors
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines
+- Follow the code style and conventions outlined in the guide
+- Write tests for new features and bug fixes
+
+### For GitHub Copilot Coding Agent
+- See [.github/copilot-instructions.md](.github/copilot-instructions.md) for repository context and guidelines
+- Follow the contribution workflow and best practices specified there
 
 ## License
 
