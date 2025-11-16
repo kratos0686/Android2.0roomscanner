@@ -2,6 +2,40 @@
 
 > **Purpose**: This file provides context and guidelines for GitHub Copilot coding agent when working on this repository. It defines the project structure, conventions, build processes, and contribution workflow.
 
+## Quick Reference
+
+### Essential Commands
+```bash
+# Build project
+./gradlew build
+
+# Run tests
+./gradlew test
+
+# Run lint
+./gradlew lint
+
+# Run all checks
+./gradlew check
+
+# Clean build
+./gradlew clean build
+```
+
+### Key Files
+- `app/build.gradle.kts` - App dependencies and configuration
+- `app/src/main/java/com/roomscanner/app/` - Main source code
+- `docs/` - Comprehensive documentation
+- `README.md` - Project overview
+- `LAUNCH_GUIDE.md` - Detailed setup guide
+
+### Common Paths
+- **Entities**: `app/src/main/java/com/roomscanner/app/data/entity/`
+- **DAOs**: `app/src/main/java/com/roomscanner/app/data/dao/`
+- **Repositories**: `app/src/main/java/com/roomscanner/app/data/repository/`
+- **UI Components**: `app/src/main/java/com/roomscanner/app/ui/`
+- **Tests**: `app/src/test/` and `app/src/androidTest/`
+
 ## Project Overview
 
 Room Scanner is a modern Android application for 3D room scanning using ARCore, with offline storage, ML-powered analysis, and cloud synchronization. This is a Kotlin-based Android project using Jetpack Compose for UI and modern Android architecture patterns.
@@ -27,6 +61,23 @@ Room Scanner is a modern Android application for 3D room scanning using ARCore, 
 - **TensorFlow Lite**: Custom ML model inference with GPU acceleration
 - **RxJava 3**: Reactive programming alongside Coroutines
 - **Kotlin Coroutines**: Asynchronous programming with Flow
+
+## Development Environment
+
+### Prerequisites
+- **JDK**: Java 17 or higher
+- **Gradle**: 8.2 (wrapper included)
+- **Android SDK**: Required for full build (API 26-34)
+- **ARCore**: Required for device testing (not needed for code-only changes)
+
+### Environment Variables
+- `ANDROID_HOME` or `ANDROID_SDK_ROOT`: Path to Android SDK (optional in CI without SDK)
+- `JAVA_HOME`: Path to JDK 17+ installation
+
+### CI/CD Environment Notes
+- **Build without Android SDK**: Expected to fail in CI environments without Android SDK. This is normal for documentation-only or configuration changes.
+- **google-services.json**: Use `app/google-services.json.example` as template in CI. Real Firebase config needed for production builds only.
+- **Emulator/Device**: Not required for code review, linting, or documentation tasks.
 
 ## Project Structure
 
@@ -361,6 +412,67 @@ When assigned an issue or task, follow this workflow:
    - No unrelated changes included
    - No sensitive data or secrets committed
 
+## Code Review and Quality Standards
+
+### Self-Review Before Submission
+Before completing your work, perform a thorough self-review:
+
+1. **Code Quality**
+   - Is the code readable and well-organized?
+   - Are variable and function names clear and descriptive?
+   - Is there appropriate error handling?
+   - Are edge cases handled?
+
+2. **Testing**
+   - Do all relevant tests pass?
+   - Have you added tests for new functionality?
+   - Are test names descriptive and follow conventions?
+
+3. **Documentation**
+   - Is the code self-documenting or properly commented?
+   - Have you updated relevant documentation files?
+   - Is the PR description clear and complete?
+
+4. **Performance**
+   - Are there any obvious performance issues?
+   - Are database operations optimized?
+   - Are resources properly managed (closed/released)?
+
+5. **Security**
+   - No hardcoded secrets or API keys?
+   - User input properly validated?
+   - No SQL injection vulnerabilities?
+   - Firebase security rules considered?
+
+### Pull Request Description Template
+
+When creating a PR, include:
+```markdown
+## Description
+[Brief description of changes]
+
+## Issue
+Closes #[issue number]
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Documentation update
+- [ ] Refactoring
+- [ ] Performance improvement
+
+## Testing
+- [ ] Unit tests pass
+- [ ] Lint checks pass
+- [ ] Manual testing completed (if applicable)
+
+## Screenshots (if UI changes)
+[Add screenshots here]
+
+## Additional Notes
+[Any additional context or notes]
+```
+
 ## What to Modify and What to Avoid
 
 ### Safe to Modify:
@@ -442,6 +554,24 @@ Do not:
 - Add unnecessary dependencies or features
 - Modify failing tests that aren't related to your changes
 
+### Issue Prioritization
+
+When multiple issues or requirements exist, prioritize in this order:
+1. **Security vulnerabilities** - Fix immediately
+2. **Build-breaking issues** - Restore build functionality
+3. **Test failures** - Related to your changes only
+4. **Feature implementation** - As specified in the issue
+5. **Code style/refactoring** - Only if directly related to the task
+6. **Documentation updates** - When APIs or behavior changes
+
+### Handling Build Failures
+
+If the build fails when you start:
+1. **Check if it's expected**: Android builds require Android SDK. In CI environments without SDK, this is normal for doc-only tasks.
+2. **Review error messages**: Determine if failure is related to your task.
+3. **Document pre-existing issues**: Note any unrelated failures in your PR description.
+4. **Focus on your scope**: Don't fix unrelated build issues unless they block your work.
+
 ## When Working with This Repository
 
 1. **Start here**: Read README.md and LAUNCH_GUIDE.md
@@ -451,3 +581,41 @@ Do not:
 5. **Test changes**: Run relevant tests after modifications
 6. **Check documentation**: Update docs if changing public interfaces
 7. **Review before committing**: Ensure changes follow project conventions
+
+---
+
+## Summary: Key Principles
+
+When working on this repository, always remember:
+
+🎯 **Minimal Changes**: Make the smallest possible changes to achieve the goal
+🔍 **Research First**: Understand existing code patterns before modifying
+🧪 **Test Thoroughly**: Run tests frequently during development
+📚 **Document Changes**: Update documentation for API or behavior changes
+🔒 **Security First**: Never commit secrets, always validate input
+🎨 **Follow Conventions**: Match existing code style and patterns
+✅ **Self-Review**: Check your work before submission
+🚫 **Avoid Scope Creep**: Stay focused on the assigned issue
+
+### Need Help?
+- **Architecture**: See `docs/ARCHITECTURE.md`
+- **Database**: See `docs/ROOM_DATABASE.md`
+- **Firebase**: See `docs/FIREBASE_SETUP.md`
+- **ARCore**: See `docs/ARCORE_INTEGRATION.md`
+- **ML/TFLite**: See `docs/TFLITE_DEPLOYMENT.md`
+- **Setup**: See `LAUNCH_GUIDE.md`
+- **Contributing**: See `CONTRIBUTING.md`
+
+### Quick Checks Before Submitting
+```bash
+# Run all checks
+./gradlew check
+
+# Verify no secrets committed
+git diff | grep -i "api.key\|password\|secret\|token"
+
+# Check commit message format
+git log --oneline -1
+```
+
+**Remember**: Quality over speed. Take time to understand the codebase and make thoughtful, well-tested changes.
