@@ -2,6 +2,70 @@
 
 > **Purpose**: This file provides context and guidelines for GitHub Copilot coding agent when working on this repository. It defines the project structure, conventions, build processes, and contribution workflow.
 
+## How to Use Copilot Coding Agent
+
+### Assigning Issues to @copilot
+
+GitHub Copilot coding agent can help with various development tasks in this repository. To use it:
+
+1. **Assign an issue to @copilot** on GitHub
+2. The agent will create a pull request with the proposed changes
+3. Review the PR and provide feedback by mentioning @copilot in comments
+4. The agent will iterate based on your feedback
+5. Approve and merge once satisfied
+
+### Appropriate Tasks for Copilot
+
+Copilot coding agent works best on **low-to-medium complexity tasks**:
+
+✅ **Good Tasks:**
+- Bug fixes with clear reproduction steps
+- Adding new features to existing components
+- Writing or updating tests
+- Refactoring specific code sections
+- Documentation updates and improvements
+- Adding new database entities or DAOs
+- Implementing new UI screens with Compose
+- Integrating new Firebase features
+- Adding new ML models or detectors
+
+❌ **Avoid Using Copilot For:**
+- Large-scale architecture changes
+- Complex ARCore low-level modifications
+- Critical security implementations
+- Deep domain-specific business logic
+- Cross-repository refactoring
+- Tasks requiring extensive manual testing on physical devices
+- Breaking changes to public APIs without careful review
+
+### Writing Good Issue Descriptions
+
+For best results when assigning issues to Copilot:
+
+- **Be specific**: Clearly describe what needs to be done
+- **Provide context**: Link to relevant code, documentation, or issues
+- **Set expectations**: Specify acceptance criteria and testing requirements
+- **Include examples**: Show expected input/output or behavior
+- **Mention constraints**: Note any specific requirements or limitations
+
+### Iterating with Copilot
+
+After Copilot creates a PR:
+
+- **Review carefully**: All changes should be reviewed before merging
+- **Provide feedback**: Comment on specific lines or mention @copilot for broader feedback
+- **Request changes**: Ask for specific modifications by mentioning @copilot
+- **Approve when ready**: Ensure all CI checks pass before merging
+
+### Custom Agents (Optional)
+
+This repository can optionally use custom Copilot agents for specialized tasks. Custom agents would be defined in `.github/agents/` directory with specific prompts and tool access. Currently, no custom agents are configured, but they can be added for:
+
+- Specialized testing workflows
+- Documentation generation
+- Code review automation
+- Domain-specific code generation
+
 ## Project Overview
 
 Room Scanner is a modern Android application for 3D room scanning using ARCore, with offline storage, ML-powered analysis, and cloud synchronization. This is a Kotlin-based Android project using Jetpack Compose for UI and modern Android architecture patterns.
@@ -441,6 +505,47 @@ Do not:
 - Change coding style of existing unmodified code
 - Add unnecessary dependencies or features
 - Modify failing tests that aren't related to your changes
+
+## Copilot Security and Sandboxing
+
+### Sandboxed Environment
+
+GitHub Copilot coding agent operates in a sandboxed environment with the following characteristics:
+
+- **Branch Isolation**: All changes are made to a dedicated branch (e.g., `copilot/*`)
+- **No Direct Merge**: Cannot merge to main branch; requires human approval
+- **Pull Request Workflow**: All changes go through PR review process
+- **CI/CD Integration**: Automated checks run on PRs before merge
+- **Limited Permissions**: Restricted access to sensitive operations
+
+### Security Best Practices
+
+When working with Copilot on this repository:
+
+1. **Never commit secrets**: Check `.gitignore` includes sensitive files
+   - `app/google-services.json` with production credentials
+   - Local configuration files
+   - API keys or tokens
+
+2. **Review Firebase changes**: Ensure proper security rules and validation
+   - Firestore security rules
+   - Storage access controls
+   - Cloud Functions authentication
+
+3. **Validate dependencies**: Check for vulnerabilities before adding new packages
+   - Use GitHub's dependency scanning
+   - Review package reputation and maintenance
+   - Test thoroughly after updates
+
+4. **Protect user data**: Follow privacy best practices
+   - Validate input before database operations
+   - Sanitize data before cloud uploads
+   - Handle PII appropriately
+
+5. **Test security changes**: Always test authentication and authorization
+   - Camera permissions handling
+   - Storage permissions
+   - Firebase authentication flows
 
 ## When Working with This Repository
 
