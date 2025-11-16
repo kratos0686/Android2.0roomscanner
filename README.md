@@ -52,6 +52,15 @@ Export scan data to industry-standard formats:
 - **BIM metadata generation**
 - **Professional workflow integration**
 
+### 🔧 Mitigate Integration
+- **Cotality Mitigate compatibility** for water mitigation projects
+- **Water damage assessment** with IICRC classification (Class 1-4)
+- **Restoration project documentation** export
+- **Moisture mapping** and drying log generation
+- **Equipment recommendations** based on damage assessment
+- **Restoration cost estimates** for insurance claims
+- **Compatible with property restoration workflows**
+
 ## Prerequisites
 - Android Studio (latest version recommended)
 - Android SDK API 34
@@ -112,6 +121,9 @@ app/
 │   │   └── VoiceGuidanceManager.java # TTS instructions
 │   ├── cad/                        # CAD/BIM integration
 │   │   └── CADBIMIntegration.java # DXF/IFC export
+│   ├── integrations/               # Third-party integrations
+│   │   ├── MitigateIntegration.java    # Cotality Mitigate export
+│   │   └── WaterDamageAssessment.java  # Damage assessment
 │   └── utils/                      # Utilities
 │       └── ScannerUtils.java      # Helper functions
 └── src/main/res/                   # Android resources
@@ -163,6 +175,26 @@ The app requires the following permissions:
 2. Tap "AR View" button
 3. Point camera at room
 4. View damage overlays and measurements in AR
+
+### Mitigate Integration (Water Damage Restoration)
+1. Complete room scan of affected area
+2. Open scan and tap "Mitigate Export"
+3. Select damage severity and water class
+4. Generate restoration report with:
+   - Water damage classification (Class 1-4)
+   - Affected materials assessment
+   - Equipment recommendations
+   - Drying log template
+   - Cost estimates for restoration
+5. Export data compatible with Mitigate by Cotality
+6. Share with restoration team or insurance adjuster
+
+### Integration Features
+- **IICRC Standards** - Follows water damage classification guidelines
+- **Moisture Mapping** - 3D visualization of affected areas
+- **Equipment Lists** - Recommendations based on damage class
+- **Drying Logs** - Track restoration progress over time
+- **Cost Documentation** - Insurance claim support
 
 ## License
 This project is licensed under the MIT License.
