@@ -114,7 +114,6 @@ Follow the detailed Firebase setup guide: [**Firebase Setup Guide**](docs/FIREBA
 
 - 📖 [**Firebase Setup Guide**](docs/FIREBASE_SETUP.md) - Complete Firebase configuration instructions
 - 📸 [**Camera Permissions Guide**](docs/CAMERA_PERMISSIONS.md) - Camera and permission handling setup
-- 🔧 [**Architecture Overview**](docs/ARCHITECTURE.md) - Project structure and design patterns
 
 ## Project Structure
 ```

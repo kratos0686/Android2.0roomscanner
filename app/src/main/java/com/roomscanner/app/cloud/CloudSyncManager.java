@@ -49,11 +49,11 @@ public class CloudSyncManager {
             String jsonData = gson.toJson(scan);
             
             // Upload to Firebase Firestore
-            // Implementation will connect to Firebase
+            // TODO: Implementation pending Firebase initialization
             // firestore.collection("scans").document(scan.getId()).set(jsonData);
             
-            scan.setSynced(true);
-            return true;
+            // Throw exception to indicate feature is not yet implemented
+            throw new UnsupportedOperationException("Cloud upload is not yet implemented. Please configure Firebase first.");
         } catch (Exception e) {
             e.printStackTrace();
             return false;

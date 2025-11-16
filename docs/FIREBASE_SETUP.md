@@ -69,6 +69,7 @@ Copy the SHA-1 value and paste it in Firebase Console.
 1. Go to **Build** → **Firestore Database**
 2. Click **Create database**
 3. Select **Start in test mode** (for development)
+   > **⚠️ IMPORTANT**: Test mode expires December 31, 2025. You MUST replace these with production security rules before this date. See section 8 for production rules.
    ```
    rules_version = '2';
    service cloud.firestore {

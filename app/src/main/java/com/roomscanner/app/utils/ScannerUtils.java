@@ -35,22 +35,22 @@ public class ScannerUtils {
         
         if (exportOBJ) {
             File objFile = new File(outputDirectory, baseName + ".obj");
-            success &= OBJExporter.exportToOBJ(scan, objFile);
+            success = success && OBJExporter.exportToOBJ(scan, objFile);
         }
         
         if (exportPLY) {
             File plyFile = new File(outputDirectory, baseName + ".ply");
-            success &= PLYExporter.exportToPLY(scan, plyFile);
+            success = success && PLYExporter.exportToPLY(scan, plyFile);
         }
         
         if (exportDXF) {
             File dxfFile = new File(outputDirectory, baseName + ".dxf");
-            success &= CADBIMIntegration.exportToDXF(scan, dxfFile);
+            success = success && CADBIMIntegration.exportToDXF(scan, dxfFile);
         }
         
         if (exportIFC) {
             File ifcFile = new File(outputDirectory, baseName + ".ifc");
-            success &= CADBIMIntegration.exportToIFC(scan, ifcFile);
+            success = success && CADBIMIntegration.exportToIFC(scan, ifcFile);
         }
         
         return success;
