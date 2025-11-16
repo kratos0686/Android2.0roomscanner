@@ -70,32 +70,51 @@ Export scan data to industry-standard formats:
 
 ## Setup Instructions
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/kratos0686/Android2.0roomscanner.git
-   cd Android2.0roomscanner
-   ```
+### 1. Clone the Repository
+```bash
+git clone https://github.com/kratos0686/Android2.0roomscanner.git
+cd Android2.0roomscanner
+```
 
-2. Configure Android SDK path:
-   - Copy `local.properties.example` to `local.properties`
-   - Update the `sdk.dir` path to point to your Android SDK location
+### 2. Configure Android SDK
+- Copy `local.properties.example` to `local.properties`
+- Update the `sdk.dir` path to point to your Android SDK location
 
-3. Open the project in Android Studio:
-   - Open Android Studio
-   - Select "Open an existing project"
-   - Navigate to the project directory and click OK
+### 3. Configure Firebase (Required for Cloud Sync)
+Follow the detailed Firebase setup guide: [**Firebase Setup Guide**](docs/FIREBASE_SETUP.md)
 
-4. Build the project:
-   ```bash
-   ./gradlew build
-   ```
+**Quick steps:**
+1. Create Firebase project at [Firebase Console](https://console.firebase.google.com)
+2. Add Android app with package name: `com.roomscanner.app`
+3. Download `google-services.json`
+4. Place `google-services.json` in the `app/` directory
+5. Enable Firebase Authentication, Firestore, and Storage
 
-5. Run the app:
-   - Connect an Android device or start an emulator
-   - Click "Run" in Android Studio or use:
-   ```bash
-   ./gradlew installDebug
-   ```
+**Note:** A template file `app/google-services.json.template` is provided for reference.
+
+### 4. Open in Android Studio
+- Launch Android Studio
+- Select "Open an existing project"
+- Navigate to the project directory and click OK
+- Wait for Gradle sync to complete
+
+### 5. Build the Project
+```bash
+./gradlew build
+```
+
+### 6. Run the App
+- Connect an Android device or start an emulator
+- Click "Run" in Android Studio or use:
+```bash
+./gradlew installDebug
+```
+
+## Documentation
+
+- 📖 [**Firebase Setup Guide**](docs/FIREBASE_SETUP.md) - Complete Firebase configuration instructions
+- 📸 [**Camera Permissions Guide**](docs/CAMERA_PERMISSIONS.md) - Camera and permission handling setup
+- 🔧 [**Architecture Overview**](docs/ARCHITECTURE.md) - Project structure and design patterns
 
 ## Project Structure
 ```
@@ -125,27 +144,30 @@ app/
 │   │   ├── MitigateIntegration.java    # Cotality Mitigate export
 │   │   └── WaterDamageAssessment.java  # Damage assessment
 │   └── utils/                      # Utilities
-│       └── ScannerUtils.java      # Helper functions
+│       ├── ScannerUtils.java      # Helper functions
+│       └── PermissionHelper.java  # Permission management
 └── src/main/res/                   # Android resources
 ```
 
-## Dependencies
-- **AndroidX Libraries** - AppCompat, Material Design, Room Database
-- **ARCore** - Augmented reality functionality
-- **Firebase** - Cloud sync (Auth, Firestore, Storage)
-- **CameraX** - Advanced camera features
-- **TensorFlow Lite** - Machine learning for material analysis
-- **Gson** - JSON parsing
-
 ## Permissions
-The app requires the following permissions:
-- `CAMERA` - For capturing 3D room data
-- `RECORD_AUDIO` - For voice command features
-- `READ_EXTERNAL_STORAGE` - For reading scan data
-- `WRITE_EXTERNAL_STORAGE` - For saving scan results
-- `INTERNET` - For cloud synchronization
-- `ACCESS_NETWORK_STATE` - For checking connectivity
-- `ACCESS_FINE_LOCATION` / `ACCESS_COARSE_LOCATION` - For AR features
+
+The app requires the following permissions for full functionality. All permissions are handled gracefully with user-friendly prompts.
+
+**Required Permissions:**
+- `CAMERA` - For capturing 3D room data and scanning
+- `WRITE_EXTERNAL_STORAGE` / `READ_EXTERNAL_STORAGE` - For saving and loading scan data
+- `RECORD_AUDIO` - For voice-guided scanning instructions
+- `ACCESS_FINE_LOCATION` - For AR features and geotagging
+- `INTERNET` - For cloud synchronization with Firebase
+- `ACCESS_NETWORK_STATE` - For checking network connectivity
+
+**Permission Handling:**
+- Permissions are requested only when needed (context-aware)
+- Clear explanations provided before requesting each permission
+- Graceful degradation when optional permissions are denied
+- Settings shortcut for permanently denied permissions
+
+See [**Camera Permissions Guide**](docs/CAMERA_PERMISSIONS.md) for detailed implementation.
 
 ## Usage
 
