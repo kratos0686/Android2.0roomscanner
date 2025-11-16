@@ -7,4 +7,7 @@
     <string name="sync">Sync</string>
     <string name="add_note">Add Note</string>
     <string name="generate_plan">Generate Drying Plan</string>
+    <string name="add_note">Add Note</string>
+    <string name="arcore_required">ARCore is required for this app</string>
+    <string name="camera_permission_required">Camera permission is required for scanning</string>
 </resources>
