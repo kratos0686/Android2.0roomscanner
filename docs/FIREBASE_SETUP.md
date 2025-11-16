@@ -1,334 +1,415 @@
 # Firebase Setup Guide
 
-This guide will help you configure Firebase for the Room Scanner app to enable cloud synchronization, authentication, and storage features.
+## Overview
+This guide walks you through setting up Firebase for the Room Scanner app, including Firestore, Cloud Functions, and Storage.
 
 ## Prerequisites
-
+- Android Studio Arctic Fox or later
 - Google account
-- Android Studio installed
-- Room Scanner project cloned and opened in Android Studio
+- Firebase project
 
-## Step 1: Create Firebase Project
+## Setup Steps
 
-1. Go to [Firebase Console](https://console.firebase.google.com)
-2. Click **"Add project"** or **"Create a project"**
-3. Enter project name: `room-scanner-app` (or your preferred name)
-4. Click **Continue**
-5. (Optional) Enable Google Analytics if desired
-6. Click **Create project**
-7. Wait for project creation to complete
+### 1. Create Firebase Project
 
-## Step 2: Add Android App to Firebase Project
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Click "Add project"
+3. Enter project name: "Room Scanner"
+4. Enable Google Analytics (optional)
+5. Click "Create project"
 
-1. In Firebase Console, click the **Android icon** to add an Android app
-2. Enter the following details:
-   - **Android package name**: `com.roomscanner.app`
-   - **App nickname** (optional): `Room Scanner`
-   - **Debug signing certificate SHA-1** (optional, but recommended for Auth)
-3. Click **Register app**
+### 2. Add Android App to Firebase
 
-### Getting SHA-1 Certificate (Optional but Recommended)
+1. In Firebase Console, click "Add app" → Android
+2. Register app:
+   - Package name: `com.roomscanner.app`
+   - App nickname: "Room Scanner"
+   - Debug signing certificate (optional for testing)
+3. Download `google-services.json`
+4. Place it in `app/` directory
 
-For authentication features, you'll need your SHA-1 certificate:
+### 3. Configure gradle files
 
-```bash
-# On Windows (Command Prompt or PowerShell)
-cd C:\Users\YOUR_USERNAME\.android
-keytool -list -v -keystore debug.keystore -alias androiddebugkey -storepass android -keypass android
+The project already includes Firebase dependencies. Verify they're in place:
 
-# On macOS/Linux (Terminal)
-keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+**Project-level `build.gradle.kts`:**
+```kotlin
+plugins {
+    id("com.google.gms.google-services") version "4.4.0" apply false
+}
 ```
 
-Copy the SHA-1 value and paste it in Firebase Console.
+**App-level `build.gradle.kts`:**
+```kotlin
+plugins {
+    id("com.google.gms.google-services")
+}
 
-## Step 3: Download google-services.json
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-functions")
+}
+```
 
-1. After registering the app, click **"Download google-services.json"**
-2. Move the downloaded file to your project's `app/` directory:
-   ```
-   Android2.0roomscanner/
-   └── app/
-       └── google-services.json  ← Place file here
-   ```
-3. Click **Next** in Firebase Console
+### 4. Enable Firebase Services
 
-## Step 4: Enable Firebase Services
+In Firebase Console, enable:
 
-### 4.1 Enable Authentication
+1. **Firestore Database**:
+   - Go to Firestore Database
+   - Click "Create database"
+   - Choose production mode
+   - Select location (choose closest to users)
 
-1. In Firebase Console, go to **Build** → **Authentication**
-2. Click **Get started**
-3. Enable sign-in methods:
-   - **Email/Password**: Toggle ON
-   - **Google**: Toggle ON (recommended)
-4. Click **Save**
+2. **Storage**:
+   - Go to Storage
+   - Click "Get started"
+   - Use default security rules (update for production)
 
-### 4.2 Enable Cloud Firestore
+3. **Cloud Functions**:
+   - Go to Functions
+   - Click "Get started"
+   - Follow setup instructions
 
-1. Go to **Build** → **Firestore Database**
-2. Click **Create database**
-3. Select **Start in test mode** (for development)
-   > **⚠️ IMPORTANT**: Test mode expires December 31, 2025. You MUST replace these with production security rules before this date. See section 8 for production rules.
-   ```
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /{document=**} {
-         allow read, write: if request.time < timestamp.date(2025, 12, 31);
-       }
-     }
-   }
-   ```
-4. Choose a Cloud Firestore location (e.g., `us-central1`)
-5. Click **Enable**
+## Firestore Data Structure
 
-### 4.3 Enable Cloud Storage
+```
+scans/
+  {scanId}/
+    - roomName: string
+    - scanDate: timestamp
+    - length: number
+    - width: number
+    - height: number
+    - pointCloudPath: string
+    - meshDataPath: string
+    - detectedObjects: string (JSON)
+    - damageAreas: string (JSON)
 
-1. Go to **Build** → **Storage**
-2. Click **Get started**
-3. Select **Start in test mode**
-   ```
-   rules_version = '2';
-   service firebase.storage {
-     match /b/{bucket}/o {
-       match /{allPaths=**} {
-         allow read, write: if request.time < timestamp.date(2025, 12, 31);
-       }
-     }
-   }
-   ```
-4. Choose a Cloud Storage location (same as Firestore)
-5. Click **Done**
+notes/
+  {noteId}/
+    - scanId: string (reference to scan)
+    - title: string
+    - content: string
+    - createdDate: timestamp
+    - category: string
+    - position: GeoPoint (optional)
+```
 
-## Step 5: Update Security Rules (Production)
+## Security Rules
 
-### Firestore Security Rules (Production)
-
-Replace test mode rules with production-ready rules:
+### Firestore Rules
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can read/write their own data
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
     
-    // Room scans - users can only access their own scans
+    // Scans collection
     match /scans/{scanId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Allow authenticated users to read/write their own scans
+      allow read, write: if request.auth != null;
     }
     
-    // Mitigate exports
-    match /mitigate_exports/{exportId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+    // Notes collection
+    match /notes/{noteId} {
+      // Allow authenticated users to read/write notes
+      allow read, write: if request.auth != null;
     }
   }
 }
 ```
 
-### Storage Security Rules (Production)
+### Storage Rules
 
 ```javascript
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // User uploads - organized by userId
-    match /scans/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    
+    // Scan files
+    match /scans/{scanId}/{allPaths=**} {
+      allow read, write: if request.auth != null;
     }
     
-    // Public scan thumbnails
-    match /thumbnails/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
+    // ML Models
+    match /models/{modelName} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only admins can upload models
     }
   }
 }
 ```
 
-## Step 6: Configure App Dependencies
+## Cloud Functions Setup
 
-The app already includes Firebase dependencies in `app/build.gradle`:
+### Initialize Cloud Functions
 
-```gradle
-dependencies {
-    // Firebase
-    implementation platform('com.google.firebase:firebase-bom:32.7.0')
-    implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.google.firebase:firebase-firestore'
-    implementation 'com.google.firebase:firebase-storage'
-    implementation 'com.google.firebase:firebase-analytics'
-}
+```bash
+# Install Firebase CLI
+npm install -g firebase-tools
+
+# Login to Firebase
+firebase login
+
+# Initialize functions
+firebase init functions
 ```
 
-## Step 7: Initialize Firebase in Your App
+### Sample Cloud Functions
 
-Firebase is automatically initialized when you add `google-services.json`. To manually initialize or configure:
+Create `functions/index.js`:
 
-```java
-// In MainActivity or Application class
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
+```javascript
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp();
 
-public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
-    private FirebaseStorage storage;
+// Process scan data
+exports.processScanData = functions.https.onCall(async (data, context) => {
+  // Verify authentication
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'User must be authenticated'
+    );
+  }
+  
+  const scanId = data.scanId;
+  
+  // Fetch scan from Firestore
+  const scanDoc = await admin.firestore()
+    .collection('scans')
+    .doc(scanId)
+    .get();
+  
+  if (!scanDoc.exists) {
+    throw new functions.https.HttpsError('not-found', 'Scan not found');
+  }
+  
+  const scanData = scanDoc.data();
+  
+  // Process the scan (example: calculate area)
+  const area = scanData.length * scanData.width;
+  const volume = area * scanData.height;
+  
+  // Update scan with processed data
+  await scanDoc.ref.update({
+    area: area,
+    volume: volume,
+    processedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  
+  return {
+    success: true,
+    area: area,
+    volume: volume
+  };
+});
+
+// Generate PDF report
+exports.generateReport = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Not authenticated');
+  }
+  
+  const scanId = data.scanId;
+  
+  // TODO: Implement PDF generation
+  // This would typically use a library like PDFKit or puppeteer
+  
+  return {
+    url: `https://example.com/reports/${scanId}.pdf`
+  };
+});
+
+// Run ML inference on uploaded images
+exports.runMLInference = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Not authenticated');
+  }
+  
+  const imageUrl = data.imageUrl;
+  const modelName = data.modelName;
+  
+  // TODO: Implement ML inference
+  // This could use Google Cloud AI APIs or custom models
+  
+  return {
+    predictions: [],
+    confidence: 0.95
+  };
+});
+
+// Batch process multiple scans
+exports.batchProcessScans = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Not authenticated');
+  }
+  
+  const scanIds = data.scanIds;
+  const results = [];
+  
+  for (const scanId of scanIds) {
+    try {
+      // Process each scan
+      const result = await processScanInternal(scanId);
+      results.push({ scanId, success: true, result });
+    } catch (error) {
+      results.push({ scanId, success: false, error: error.message });
+    }
+  }
+  
+  return { results };
+});
+
+// Estimate costs based on scan data
+exports.estimateCosts = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Not authenticated');
+  }
+  
+  const scanId = data.scanId;
+  
+  const scanDoc = await admin.firestore()
+    .collection('scans')
+    .doc(scanId)
+    .get();
+  
+  if (!scanDoc.exists) {
+    throw new functions.https.HttpsError('not-found', 'Scan not found');
+  }
+  
+  const scanData = scanDoc.data();
+  const area = scanData.length * scanData.width;
+  
+  // Example cost estimation (customize based on your needs)
+  const paintCostPerSqFt = 2.5;
+  const laborCostPerSqFt = 3.0;
+  
+  const materialCost = area * paintCostPerSqFt;
+  const laborCost = area * laborCostPerSqFt;
+  
+  return {
+    materialCost: materialCost,
+    laborCost: laborCost,
+    totalCost: materialCost + laborCost,
+    area: area
+  };
+});
+```
+
+### Deploy Cloud Functions
+
+```bash
+firebase deploy --only functions
+```
+
+## Usage in Android App
+
+### Initialize Firebase
+
+```kotlin
+// Firebase is auto-initialized via google-services.json
+// Access services directly:
+
+val firestore = Firebase.firestore
+val storage = Firebase.storage
+val functions = Firebase.functions
+```
+
+### Sync Data to Firestore
+
+```kotlin
+class FirebaseRepository(
+    private val firestoreSync: FirestoreSync,
+    private val localRepository: ScanRepository
+) {
     
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        // Initialize Firebase (happens automatically)
-        FirebaseApp.initializeApp(this);
-        
-        // Get Firebase instances
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
+    suspend fun syncScan(scan: ScanEntity) {
+        val firebaseId = firestoreSync.uploadScan(scan)
+        if (firebaseId != null) {
+            localRepository.markScanAsSynced(scan.id, firebaseId)
+        }
     }
 }
 ```
 
-## Step 8: Test Firebase Connection
+### Call Cloud Functions
 
-### Test Authentication
+```kotlin
+val cloudFunctions = CloudFunctionsClient()
 
-```java
-// Sign in anonymously for testing
-mAuth.signInAnonymously()
-    .addOnCompleteListener(this, task -> {
-        if (task.isSuccessful()) {
-            FirebaseUser user = mAuth.getCurrentUser();
-            Log.d("Firebase", "User ID: " + user.getUid());
-            Toast.makeText(this, "Firebase connected!", Toast.LENGTH_SHORT).show();
-        } else {
-            Log.e("Firebase", "Auth failed", task.getException());
-            Toast.makeText(this, "Firebase connection failed", Toast.LENGTH_SHORT).show();
-        }
-    });
+// Process scan
+lifecycleScope.launch {
+    val result = cloudFunctions.processScanData(scanId)
+    result?.let {
+        // Handle processed data
+        val area = it["area"] as? Double
+        val volume = it["volume"] as? Double
+    }
+}
 ```
 
-### Test Firestore
+### Upload to Storage
 
-```java
-// Write test document
-Map<String, Object> testData = new HashMap<>();
-testData.put("test", "Hello Firebase");
-testData.put("timestamp", System.currentTimeMillis());
+```kotlin
+val storageManager = StorageManager()
 
-db.collection("test")
-    .add(testData)
-    .addOnSuccessListener(documentReference -> {
-        Log.d("Firestore", "Document added: " + documentReference.getId());
-    })
-    .addOnFailureListener(e -> {
-        Log.e("Firestore", "Error adding document", e);
-    });
+lifecycleScope.launch {
+    val pointCloudFile = File("/path/to/pointcloud.bin")
+    val url = storageManager.uploadPointCloud(scanId, pointCloudFile)
+    
+    if (url != null) {
+        // Update scan with storage URL
+        scan.copy(pointCloudPath = url)
+    }
+}
 ```
 
-## Step 9: Verify Installation
+## Testing
 
-1. Build and run the app on a device or emulator
-2. Check Logcat for Firebase initialization messages
-3. Go to Firebase Console → **Authentication** → **Users** tab
-4. You should see users appear when they sign in
-5. Go to **Firestore Database** to see data being written
+### Use Firebase Emulator Suite
+
+```bash
+# Install emulators
+firebase init emulators
+
+# Start emulators
+firebase emulators:start
+```
+
+In your app, connect to emulators:
+
+```kotlin
+if (BuildConfig.DEBUG) {
+    Firebase.firestore.useEmulator("10.0.2.2", 8080)
+    Firebase.functions.useEmulator("10.0.2.2", 5001)
+    Firebase.storage.useEmulator("10.0.2.2", 9199)
+}
+```
 
 ## Troubleshooting
 
-### google-services.json not found
+### Common Issues
 
-**Error**: `File google-services.json is missing`
+1. **"Default FirebaseApp is not initialized"**
+   - Ensure `google-services.json` is in the `app/` directory
+   - Check that `com.google.gms.google-services` plugin is applied
 
-**Solution**: 
-- Ensure `google-services.json` is in the `app/` directory (not `app/src/`)
-- Clean and rebuild the project: **Build** → **Clean Project** → **Rebuild Project**
+2. **"Permission denied" errors**
+   - Update Firestore/Storage security rules
+   - Ensure user is authenticated
 
-### Package name mismatch
+3. **Cloud Functions timeout**
+   - Increase function timeout in Firebase Console
+   - Optimize function code for performance
 
-**Error**: `The package name 'com.xxx' does not match the expected package name`
+## See Also
 
-**Solution**:
-- Verify package name in `AndroidManifest.xml` matches Firebase Console
-- Re-download `google-services.json` with correct package name
-
-### Build fails with Firebase errors
-
-**Solution**:
-- Ensure Google Services plugin is applied in `app/build.gradle`:
-  ```gradle
-  apply plugin: 'com.google.gms.google-services'
-  ```
-- Update Android Studio and Gradle plugin to latest versions
-
-### Authentication not working
-
-**Solution**:
-- Add SHA-1 certificate to Firebase Console
-- Enable desired sign-in methods in Firebase Authentication
-- Check device has internet connection
-
-## Usage in CloudSyncManager
-
-The app includes `CloudSyncManager.java` for cloud operations:
-
-```java
-CloudSyncManager syncManager = new CloudSyncManager(this);
-
-// Upload scan
-syncManager.uploadScan(roomScan, new CloudSyncManager.UploadCallback() {
-    @Override
-    public void onSuccess(String scanId) {
-        Log.d("CloudSync", "Scan uploaded: " + scanId);
-    }
-    
-    @Override
-    public void onFailure(Exception e) {
-        Log.e("CloudSync", "Upload failed", e);
-    }
-});
-
-// Download scans
-syncManager.downloadScans(new CloudSyncManager.DownloadCallback() {
-    @Override
-    public void onSuccess(List<RoomScan> scans) {
-        Log.d("CloudSync", "Downloaded " + scans.size() + " scans");
-    }
-    
-    @Override
-    public void onFailure(Exception e) {
-        Log.e("CloudSync", "Download failed", e);
-    }
-});
-```
-
-## Security Best Practices
-
-1. **Never commit google-services.json to public repositories** (already in `.gitignore`)
-2. Update security rules from test mode to production rules
-3. Enable App Check for additional security
-4. Use Firebase Security Rules to restrict access
-5. Implement proper user authentication
-6. Enable Firebase Analytics to monitor usage
-7. Set up budget alerts in Firebase Console
-
-## Additional Resources
-
-- [Firebase Documentation](https://firebase.google.com/docs)
-- [Firebase Android Setup](https://firebase.google.com/docs/android/setup)
-- [Cloud Firestore Get Started](https://firebase.google.com/docs/firestore/quickstart)
-- [Firebase Authentication](https://firebase.google.com/docs/auth/android/start)
-- [Firebase Storage](https://firebase.google.com/docs/storage/android/start)
-
-## Support
-
-For issues or questions:
-1. Check [Firebase Status Dashboard](https://status.firebase.google.com/)
-2. Visit [StackOverflow Firebase Tag](https://stackoverflow.com/questions/tagged/firebase)
-3. Review [Firebase Support](https://firebase.google.com/support)
+- [Cloud Functions Documentation](CLOUD_FUNCTIONS.md)
+- [Storage Integration](STORAGE_INTEGRATION.md)
+- [Room Database Sync](ROOM_DATABASE.md)
