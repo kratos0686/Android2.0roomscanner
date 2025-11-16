@@ -1,1 +1,0 @@
-// Sample MainActivity code integrating ARCore
