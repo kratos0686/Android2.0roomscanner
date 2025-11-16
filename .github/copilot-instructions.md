@@ -1,8 +1,12 @@
 # GitHub Copilot Instructions for Room Scanner
 
+> **Purpose**: This file provides context and guidelines for GitHub Copilot coding agent when working on this repository. It defines the project structure, conventions, build processes, and contribution workflow.
+
 ## Project Overview
 
 Room Scanner is a modern Android application for 3D room scanning using ARCore, with offline storage, ML-powered analysis, and cloud synchronization. This is a Kotlin-based Android project using Jetpack Compose for UI and modern Android architecture patterns.
+
+**Primary Function**: Enable users to scan rooms in 3D using their Android device camera, analyze the scan data with ML models, store scans offline, and sync to cloud storage.
 
 ## Technology Stack
 
@@ -116,6 +120,31 @@ app/src/main/java/com/roomscanner/app/
 - Support RxJava 3 for existing reactive code
 - ViewModels should use `viewModelScope` for coroutines
 - DAOs support both Flow and RxJava observables
+
+### Compose UI Best Practices
+- Use `remember` to avoid unnecessary recomposition
+- Use `derivedStateOf` for computed state
+- Hoist state to appropriate level (lowest common ancestor)
+- Use `LaunchedEffect` for side effects with lifecycle awareness
+- Follow Material 3 design guidelines
+- Keep Composable functions small and focused
+- Use preview annotations for development
+
+### Error Handling
+- Use `Result` type for operations that can fail
+- Provide meaningful error messages
+- Log errors with appropriate tags
+- Handle network failures gracefully (offline-first)
+- Show user-friendly error messages in UI
+- Use try-catch for expected exceptions
+- Let unexpected exceptions crash (fail fast)
+
+### Resource Management
+- Close resources properly (use `use` function)
+- Cancel coroutines when no longer needed
+- Unregister listeners and observers
+- Release camera and AR session resources
+- Close database connections appropriately
 
 ### Database (Room)
 - Entities in `data/entity/` package
@@ -258,6 +287,160 @@ Before building:
 - Optimize Compose recomposition with remember and derivedStateOf
 - Profile with Android Profiler before optimizing
 - Use R8 code shrinking for release builds
+
+## Common Build Issues and Solutions
+
+### Android SDK Not Found
+**Issue**: Build fails with "SDK location not found"
+**Solution**: This is expected in CI/CD environments without Android SDK. For local development, ensure Android SDK is installed via Android Studio.
+
+### Google Services Plugin Errors
+**Issue**: `google-services.json` related errors
+**Solution**: Use the example file `app/google-services.json.example` as a template. For production builds, replace with actual Firebase configuration.
+
+### Gradle Sync Failures
+**Issue**: Dependencies fail to download or sync
+**Solution**: 
+```bash
+./gradlew clean
+./gradlew build --refresh-dependencies
+```
+
+### KSP/Kapt Errors
+**Issue**: Annotation processing fails for Room database
+**Solution**: Ensure KSP version matches Kotlin version in `build.gradle.kts`
+
+### Memory Issues During Build
+**Issue**: Gradle daemon runs out of memory
+**Solution**: Check `gradle.properties` for memory settings:
+```properties
+org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m
+```
+
+## Contribution Workflow for Copilot
+
+When assigned an issue or task, follow this workflow:
+
+1. **Understand the Context**
+   - Read README.md and LAUNCH_GUIDE.md for project overview
+   - Review docs/ARCHITECTURE.md to understand system design
+   - Check related documentation in `docs/` directory
+   - Examine existing code in the affected areas
+
+2. **Verify Current State**
+   - Run `./gradlew build` to ensure the project builds
+   - Run `./gradlew test` to check all tests pass
+   - Run `./gradlew lint` to check code quality
+   - Note any pre-existing failures (not your responsibility to fix)
+
+3. **Implement Changes**
+   - Make minimal, surgical changes only
+   - Follow existing code patterns and conventions
+   - Add appropriate error handling and logging
+   - Update relevant documentation if needed
+   - Add or update tests for new functionality
+
+4. **Test Your Changes**
+   - Run `./gradlew build` to verify compilation
+   - Run `./gradlew test` to verify tests pass
+   - Run `./gradlew lint` to check code style
+   - Run `./gradlew check` for comprehensive checks
+   - Test manually if UI changes are involved
+
+5. **Commit and Document**
+   - Use clear, descriptive commit messages
+   - Follow Conventional Commits format (e.g., "feat:", "fix:", "docs:")
+   - Update PR description with changes made
+   - Link to related issues or documentation
+
+6. **Review Checklist**
+   - Code follows Kotlin conventions
+   - No security vulnerabilities introduced
+   - Tests added/updated and passing
+   - Documentation updated if needed
+   - No unrelated changes included
+   - No sensitive data or secrets committed
+
+## What to Modify and What to Avoid
+
+### Safe to Modify:
+- Source files in `app/src/main/java/com/roomscanner/app/`
+- Test files in `app/src/test/` and `app/src/androidTest/`
+- Resource files in `app/src/main/res/` (layouts, strings, etc.)
+- Documentation files in `docs/` directory
+- Build configuration files if adding dependencies
+- README.md and LAUNCH_GUIDE.md for documentation updates
+
+### Avoid Modifying Unless Necessary:
+- `.github/workflows/` - CI/CD configuration (unless fixing CI issues)
+- `gradle/wrapper/` - Gradle wrapper files
+- `.gitignore` - Git ignore rules (unless adding new patterns)
+- `app/google-services.json` - Firebase configuration (sensitive)
+- Root-level configuration files without good reason
+
+### Never Modify:
+- `.git/` directory
+- `build/` directories (generated files)
+- `.gradle/` directory (Gradle cache)
+- Any secrets or API keys
+
+## Testing Requirements
+
+- **Unit Tests**: Required for new business logic, data operations, and utilities
+- **Coverage Target**: Aim for >80% code coverage on new code
+- **Test Location**: 
+  - Unit tests in `app/src/test/`
+  - Instrumentation tests in `app/src/androidTest/`
+- **Test Naming**: Use descriptive names like `insertScan_validData_returnsId()`
+- **Test Structure**: Follow Arrange-Act-Assert pattern
+- **Mock External Dependencies**: Use MockK or similar for Firebase, ARCore, etc.
+
+## Commit Message Format
+
+Follow Conventional Commits specification:
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+
+**Examples:**
+- `feat(database): add support for scan metadata`
+- `fix(arcore): resolve camera permission crash`
+- `docs(readme): update Firebase setup instructions`
+- `test(scan-dao): add tests for delete operations`
+
+## Expected Behavior for Issues
+
+When assigned an issue:
+
+1. **Acknowledge**: Understand the problem statement clearly
+2. **Scope**: Work only on the specific issue assigned
+3. **Research**: Check existing code and documentation first
+4. **Plan**: Outline your approach before coding
+5. **Implement**: Make targeted, minimal changes
+6. **Test**: Verify your changes work as expected
+7. **Document**: Update relevant documentation
+8. **Review**: Self-review before submitting PR
+
+Do not:
+- Fix unrelated issues or bugs
+- Refactor code not related to the task
+- Change coding style of existing unmodified code
+- Add unnecessary dependencies or features
+- Modify failing tests that aren't related to your changes
 
 ## When Working with This Repository
 
