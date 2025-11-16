@@ -1,3 +1,5 @@
+# Built application files
+*.apk
 *.iml
 .gradle
 /local.properties
@@ -67,6 +69,17 @@ captures/
 .idea/modules.xml
 .idea/.name
 .idea/compiler.xml
+.idea/copyright/profiles_settings.xml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
 .idea/misc.xml
 .idea/vcs.xml
 .idea/
@@ -79,6 +92,9 @@ captures/
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
 .cxx/
 
 # Version control
@@ -116,6 +132,8 @@ lint/intermediates/
 lint/generated/
 lint/outputs/
 lint/tmp/
+lint-results*.xml
+
 lint-results*.html
 lint-results*.xml
 
