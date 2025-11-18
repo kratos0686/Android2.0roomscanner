@@ -13,6 +13,7 @@ local.properties
 
 # Firebase
 google-services.json
+firebase-debug.log
 
 # Keystore files
 *.jks
@@ -34,7 +35,6 @@ google-services.json
 bin/
 gen/
 out/
-release/
 
 # Gradle files
 .gradle/
