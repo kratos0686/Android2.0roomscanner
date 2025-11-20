@@ -2,11 +2,13 @@
 
 This directory contains GitHub-specific configuration files for the Room Scanner project.
 
-## Files in This Directory
+## Files and Directories
 
 ### `copilot-instructions.md`
 
 Comprehensive instructions and guidelines for GitHub Copilot coding agent when working on this repository.
+
+This file follows [GitHub Copilot best practices](https://docs.github.com/en/copilot/tutorials/coding-agent/get-the-best-results).
 
 **Key sections include:**
 - How to use Copilot coding agent with this repository
@@ -16,6 +18,29 @@ Comprehensive instructions and guidelines for GitHub Copilot coding agent when w
 - Code conventions and architecture patterns
 - Common development tasks
 - Security considerations and best practices
+- Reference to official best practices documentation
+
+### `agents/`
+
+Directory for custom Copilot agents with specialized expertise. Custom agents can be defined here for:
+- Domain-specific tasks (ARCore, Firebase, ML/AI)
+- Specialized workflows (testing, documentation)
+- Platform-specific knowledge
+
+See [agents/README.md](agents/README.md) for details on creating custom agents.
+
+**Current Status**: No custom agents configured. Directory serves as a placeholder for future use.
+
+### `instructions/`
+
+Directory for scoped, path-specific, or agent-specific instructions. Allows for:
+- Instructions that apply only to specific file paths
+- Different guidance for coding agent vs code review agent
+- Module-specific conventions
+
+See [instructions/README.md](instructions/README.md) for details on scoped instructions.
+
+**Current Status**: No scoped instructions defined. The main `copilot-instructions.md` provides comprehensive project-wide guidance.
 
 **For contributors:** If you're using GitHub Copilot coding agent, please read the [copilot-instructions.md](copilot-instructions.md) file first. It provides important context about the project structure, conventions, and workflows.
 
@@ -52,12 +77,15 @@ Comprehensive instructions and guidelines for GitHub Copilot coding agent when w
 
 ## Future Enhancements
 
-This directory can be expanded with:
+This directory structure supports advanced Copilot features:
 
-- **Custom Agents** (`.github/agents/`): Specialized agents for specific tasks
+- **Custom Agents** (`.github/agents/`): Define specialized agents for specific tasks *(directory created, ready for use)*
+- **Scoped Instructions** (`.github/instructions/`): Path or agent-specific guidance *(directory created, ready for use)*
 - **Issue Templates** (`.github/ISSUE_TEMPLATE/`): Structured issue creation
 - **Pull Request Template** (`.github/PULL_REQUEST_TEMPLATE.md`): PR guidelines
 - **Workflows** (`.github/workflows/`): CI/CD automation with GitHub Actions
+
+The `agents/` and `instructions/` directories are now set up with documentation for future expansion as project needs evolve.
 
 ## Maintenance
 
