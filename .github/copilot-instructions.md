@@ -1,6 +1,8 @@
 # GitHub Copilot Instructions for Room Scanner
 
 > **Purpose**: This file provides context and guidelines for GitHub Copilot coding agent when working on this repository. It defines the project structure, conventions, build processes, and contribution workflow.
+>
+> **Reference**: These instructions follow [GitHub Copilot coding agent best practices](https://docs.github.com/en/copilot/tutorials/coding-agent/get-the-best-results).
 
 ## How to Use Copilot Coding Agent
 
