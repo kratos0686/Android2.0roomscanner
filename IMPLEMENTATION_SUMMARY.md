@@ -82,7 +82,7 @@ This implementation provides a complete, production-ready Android application fo
   - Priority-based action items
 
 ### ✅ 8. Documentation
-- **ARCHITECTURE.md**: Complete architecture overview with diagrams
+- **docs/ARCHITECTURE.md**: Complete architecture overview with diagrams
 - **SAMPLE_INTEGRATION.md**: Detailed integration examples with code
 - **SETUP.md**: Step-by-step setup instructions
 - **README.md**: Project overview and quick start
@@ -161,7 +161,9 @@ Android2.0roomscanner/
 ├── settings.gradle.kts                     # Project settings
 ├── .gitignore
 ├── README.md
-├── ARCHITECTURE.md
+├── docs/
+│   ├── ARCHITECTURE.md
+│   └── FIREBASE_SETUP.md
 ├── SAMPLE_INTEGRATION.md
 └── SETUP.md
 ```
