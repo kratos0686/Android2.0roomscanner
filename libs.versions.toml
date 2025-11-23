@@ -1,0 +1,12 @@
+# gradle/libs.versions.toml
+
+[versions]
+# ... other versions
+firebaseBom = "33.1.2" # Add the Firebase Bill of Materials (BoM)
+
+[libraries]
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" } # No version needed when using BoM
+
+[plugins]
+# ...

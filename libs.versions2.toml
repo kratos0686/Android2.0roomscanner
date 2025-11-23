@@ -1,0 +1,19 @@
+[versions]
+androidGradlePlugin = "8.2.0"
+kotlin = "2.0.0"
+googleServices = "4.4.4"
+firebaseCrashlyticsPlugin = "2.9.1"
+firebaseBom = "33.1.2"
+
+[libraries]
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+# You can add your other planned libraries here too!
+# ex: room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
