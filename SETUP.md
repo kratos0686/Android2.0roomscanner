@@ -259,7 +259,7 @@ android {
 
 After successful setup:
 
-1. Read [ARCHITECTURE.md](ARCHITECTURE.md) to understand the codebase
+1. Read [ARCHITECTURE.md](docs/ARCHITECTURE.md) to understand the codebase
 2. Check [SAMPLE_INTEGRATION.md](SAMPLE_INTEGRATION.md) for integration examples
 3. Explore the UI screens in `app/src/main/java/com/roomscanner/app/ui/`
 4. Test ARCore scanning functionality
