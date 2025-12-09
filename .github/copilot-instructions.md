@@ -4,6 +4,70 @@
 >
 > **Reference**: These instructions follow [GitHub Copilot coding agent best practices](https://docs.github.com/en/copilot/tutorials/coding-agent/get-the-best-results).
 
+---
+
+**📱 Room Scanner** is a Kotlin-based Android application for 3D room scanning using ARCore, Jetpack Compose UI, Room database, and Firebase cloud services. Follow MVVM architecture, Material Design 3, and write tests for all new code.
+
+**Quick Start**: `./gradlew build test lint` • **Source**: `app/src/main/java/com/roomscanner/app/` • **Min SDK**: 26
+
+---
+
+## Table of Contents
+
+- [Quick Reference](#quick-reference)
+- [How to Use Copilot Coding Agent](#how-to-use-copilot-coding-agent)
+- [Project Overview](#project-overview)
+- [Technology Stack](#technology-stack)
+- [Project Structure](#project-structure)
+- [Building and Testing](#building-and-testing)
+- [Code Conventions](#code-conventions)
+- [File Modifications](#file-modifications)
+- [Important Configuration Files](#important-configuration-files)
+- [Dependencies Management](#dependencies-management)
+- [Common Tasks](#common-tasks)
+- [Documentation](#documentation)
+- [Security Considerations](#security-considerations)
+- [Debugging Tips](#debugging-tips)
+- [Performance Best Practices](#performance-best-practices)
+- [Common Build Issues and Solutions](#common-build-issues-and-solutions)
+- [Contribution Workflow for Copilot](#contribution-workflow-for-copilot)
+- [Testing Requirements](#testing-requirements)
+- [Commit Message Format](#commit-message-format)
+
+## Quick Reference
+
+### Essential Commands
+```bash
+# Build and test
+./gradlew build                    # Full build
+./gradlew test                     # Run unit tests
+./gradlew lint                     # Code quality checks
+./gradlew check                    # All checks (test + lint)
+
+# Install and run
+./gradlew installDebug             # Install on device
+./gradlew assembleDebug            # Build APK
+
+# Clean build
+./gradlew clean build              # Fresh build
+```
+
+### Key Paths
+- **Source code**: `app/src/main/java/com/roomscanner/app/`
+- **Tests**: `app/src/test/` (unit) and `app/src/androidTest/` (instrumentation)
+- **Resources**: `app/src/main/res/`
+- **Documentation**: `docs/` directory
+- **Firebase config**: `app/google-services.json` (use `.example` template)
+
+### Package Structure
+- `data/entity/` - Room database entities
+- `data/dao/` - Data Access Objects
+- `data/repository/` - Repository layer
+- `arcore/` - AR scanning features
+- `ml/` - Machine learning models
+- `firebase/` - Cloud integration
+- `ui/` - Compose UI components
+
 ## How to Use Copilot Coding Agent
 
 ### Assigning Issues to @copilot
@@ -164,16 +228,46 @@ app/src/main/java/com/roomscanner/app/
 ### Kotlin Style
 - Follow official Kotlin coding conventions
 - Use Kotlin idioms (data classes, sealed classes, extension functions)
-- Prefer immutability (val over var)
+- Prefer immutability (`val` over `var`)
 - Use trailing commas in multiline declarations
-- Keep functions small and focused
+- Keep functions small and focused (max ~30 lines)
+
+**Example:**
+```kotlin
+// ✅ Good: Immutable data class with trailing comma
+data class ScanEntity(
+    val id: Long,
+    val roomName: String,
+    val timestamp: Long,
+    val isSynced: Boolean,
+)
+
+// ❌ Avoid: Mutable properties
+data class ScanEntity(
+    var id: Long,
+    var roomName: String,
+)
+```
 
 ### Naming Conventions
 - **Classes**: PascalCase (e.g., `ScanEntity`, `ARCoreSessionManager`)
 - **Functions**: camelCase (e.g., `insertScan`, `detectObjects`)
 - **Properties**: camelCase (e.g., `roomName`, `isSynced`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `DATABASE_NAME`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `DATABASE_NAME`, `MAX_RETRIES`)
 - **Resources**: snake_case (e.g., `activity_main`, `scan_item`)
+
+**Example:**
+```kotlin
+// ✅ Good naming
+class ScanRepository {
+    companion object {
+        private const val DATABASE_NAME = "room_scanner.db"
+    }
+    
+    suspend fun insertScan(entity: ScanEntity): Long { }
+    fun getAllScans(): Flow<List<ScanEntity>> { }
+}
+```
 
 ### Architecture Patterns
 - Use MVVM pattern with ViewModels for UI logic
@@ -196,6 +290,52 @@ app/src/main/java/com/roomscanner/app/
 - Keep Composable functions small and focused
 - Use preview annotations for development
 
+**Example:**
+```kotlin
+// ✅ Good: State hoisting and remember
+@Composable
+fun ScanListScreen(
+    viewModel: ScanViewModel = hiltViewModel()
+) {
+    val scans by viewModel.scans.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    
+    ScanListContent(
+        scans = scans,
+        uiState = uiState,
+        onScanClick = viewModel::onScanSelected,
+    )
+}
+
+@Composable
+private fun ScanListContent(
+    scans: List<Scan>,
+    uiState: UiState,
+    onScanClick: (Long) -> Unit,
+) {
+    LazyColumn {
+        items(scans) { scan ->
+            ScanItem(
+                scan = scan,
+                onClick = { onScanClick(scan.id) }
+            )
+        }
+    }
+}
+
+// ✅ Good: Use Preview annotations
+@Preview(showBackground = true)
+@Composable
+private fun ScanItemPreview() {
+    RoomScannerTheme {
+        ScanItem(
+            scan = Scan(id = 1, name = "Living Room", timestamp = 0L),
+            onClick = {}
+        )
+    }
+}
+```
+
 ### Error Handling
 - Use `Result` type for operations that can fail
 - Provide meaningful error messages
@@ -204,6 +344,29 @@ app/src/main/java/com/roomscanner/app/
 - Show user-friendly error messages in UI
 - Use try-catch for expected exceptions
 - Let unexpected exceptions crash (fail fast)
+
+**Example:**
+```kotlin
+// ✅ Good: Using Result type
+suspend fun syncScanToCloud(scanId: Long): Result<Unit> {
+    return try {
+        val scan = scanDao.getScanById(scanId)
+        firestoreSync.uploadScan(scan)
+        Result.success(Unit)
+    } catch (e: NetworkException) {
+        Log.e(TAG, "Network error syncing scan $scanId", e)
+        Result.failure(e)
+    }
+}
+
+// ✅ Good: ViewModel handling Result
+viewModelScope.launch {
+    when (val result = repository.syncScanToCloud(scanId)) {
+        is Result.Success -> _uiState.value = UiState.Success
+        is Result.Failure -> _uiState.value = UiState.Error("Sync failed. Try again later.")
+    }
+}
+```
 
 ### Resource Management
 - Close resources properly (use `use` function)
@@ -219,6 +382,30 @@ app/src/main/java/com/roomscanner/app/
 - Support both suspend functions and RxJava observables in DAOs
 - Use foreign key relationships where appropriate
 - Enable auto-backup in database configuration
+
+**Example:**
+```kotlin
+// ✅ Good: Entity with proper annotations
+@Entity(tableName = "scans")
+data class ScanEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "room_name") val roomName: String,
+    @ColumnInfo(name = "created_at") val createdAt: Long,
+    @ColumnInfo(name = "is_synced") val isSynced: Boolean = false,
+)
+
+// ✅ Good: DAO with both suspend and Flow support
+@Dao
+interface ScanDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertScan(scan: ScanEntity): Long
+    
+    @Query("SELECT * FROM scans ORDER BY created_at DESC")
+    fun getAllScans(): Flow<List<ScanEntity>>
+}
+```
+
+> ⚠️ **Important**: Always increment database version and provide migration when modifying entities or adding new tables.
 
 ### Firebase Integration
 - Keep Firebase operations in `firebase/` package
@@ -288,6 +475,52 @@ app/src/main/java/com/roomscanner/app/
 4. Increment database version and add migration
 5. Add repository methods for data access
 
+**Example:**
+```kotlin
+// 1. Create entity
+@Entity(tableName = "notes")
+data class NoteEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val scanId: Long,
+    val content: String,
+    val createdAt: Long,
+)
+
+// 2. Create DAO
+@Dao
+interface NoteDao {
+    @Insert
+    suspend fun insertNote(note: NoteEntity): Long
+    
+    @Query("SELECT * FROM notes WHERE scanId = :scanId")
+    fun getNotesForScan(scanId: Long): Flow<List<NoteEntity>>
+}
+
+// 3. Update AppDatabase
+@Database(
+    entities = [ScanEntity::class, NoteEntity::class],
+    version = 2  // Increment version!
+)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun scanDao(): ScanDao
+    abstract fun noteDao(): NoteDao
+}
+
+// 4. Add migration
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            CREATE TABLE IF NOT EXISTS notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                scanId INTEGER NOT NULL,
+                content TEXT NOT NULL,
+                createdAt INTEGER NOT NULL
+            )
+        """)
+    }
+}
+```
+
 ### Integrating a new ML model:
 1. Place `.tflite` model in `app/src/main/assets/`
 2. Enable `mlModelBinding = true` in build.gradle.kts
@@ -330,12 +563,22 @@ Before building:
 
 ## Security Considerations
 
+> 🔒 **Critical**: Never commit sensitive data to the repository. Always review changes before committing.
+
 - Never commit `google-services.json` with production keys
 - Use `.gitignore` to exclude sensitive files
 - Validate user input before database operations
 - Sanitize data before Firebase uploads
 - Use ProGuard/R8 for release builds
 - Check permissions at runtime for camera and storage
+
+**Security Checklist:**
+- [ ] No API keys or secrets in code
+- [ ] Production `google-services.json` not committed
+- [ ] User input validated and sanitized
+- [ ] Permissions checked at runtime
+- [ ] ProGuard rules configured for release
+- [ ] Firebase security rules properly configured
 
 ## Debugging Tips
 
@@ -461,6 +704,40 @@ When assigned an issue or task, follow this workflow:
 - **Test Structure**: Follow Arrange-Act-Assert pattern
 - **Mock External Dependencies**: Use MockK or similar for Firebase, ARCore, etc.
 
+**Example Unit Test:**
+```kotlin
+@Test
+fun insertScan_validData_returnsId() = runTest {
+    // Arrange
+    val scan = ScanEntity(
+        roomName = "Living Room",
+        createdAt = System.currentTimeMillis(),
+        isSynced = false
+    )
+    
+    // Act
+    val id = scanDao.insertScan(scan)
+    
+    // Assert
+    assertThat(id).isGreaterThan(0)
+    val retrieved = scanDao.getScanById(id)
+    assertThat(retrieved?.roomName).isEqualTo("Living Room")
+}
+
+@Test
+fun syncScan_networkError_returnsFailure() = runTest {
+    // Arrange
+    val repository = ScanRepository(scanDao, mockFirestore)
+    coEvery { mockFirestore.uploadScan(any()) } throws NetworkException()
+    
+    // Act
+    val result = repository.syncScanToCloud(scanId = 1)
+    
+    // Assert
+    assertThat(result.isFailure).isTrue()
+}
+```
+
 ## Commit Message Format
 
 Follow Conventional Commits specification:
@@ -481,12 +758,42 @@ Follow Conventional Commits specification:
 - `refactor`: Code refactoring
 - `test`: Adding or updating tests
 - `chore`: Maintenance tasks
+- `perf`: Performance improvements
+- `ci`: CI/CD changes
 
 **Examples:**
-- `feat(database): add support for scan metadata`
-- `fix(arcore): resolve camera permission crash`
-- `docs(readme): update Firebase setup instructions`
-- `test(scan-dao): add tests for delete operations`
+```bash
+# Feature addition
+feat(database): add support for scan metadata
+feat(ui): implement scan detail screen with Compose
+
+# Bug fix
+fix(arcore): resolve camera permission crash on Android 13
+fix(firebase): handle offline mode for Firestore sync
+
+# Documentation
+docs(readme): update Firebase setup instructions
+docs(architecture): add sequence diagram for scan flow
+
+# Testing
+test(scan-dao): add tests for delete operations
+test(ml): add unit tests for object detection
+
+# Refactoring
+refactor(repository): simplify scan sync logic
+refactor(ui): extract common Composable functions
+
+# Multiple changes (use body)
+feat(scan): add support for room annotations
+
+- Add NoteEntity and NoteDao for annotations
+- Implement note creation in scan detail screen
+- Add Firebase sync for notes
+
+Closes #123
+```
+
+> 💡 **Tip**: Use `git commit -v` to see the diff while writing commit message for context.
 
 ## Expected Behavior for Issues
 
@@ -551,10 +858,50 @@ When working with Copilot on this repository:
 
 ## When Working with This Repository
 
-1. **Start here**: Read README.md and LAUNCH_GUIDE.md
-2. **Understand architecture**: Review docs/ARCHITECTURE.md
-3. **Build first**: Run `./gradlew build` to ensure clean state
-4. **Make minimal changes**: Only modify what's necessary for the task
-5. **Test changes**: Run relevant tests after modifications
-6. **Check documentation**: Update docs if changing public interfaces
-7. **Review before committing**: Ensure changes follow project conventions
+### Quick Start Checklist
+
+When starting a new task, follow this workflow:
+
+1. ✅ **Start here**: Read README.md and LAUNCH_GUIDE.md
+2. ✅ **Understand architecture**: Review docs/ARCHITECTURE.md
+3. ✅ **Verify build**: Run `./gradlew build` to ensure clean state
+4. ✅ **Run tests**: Execute `./gradlew test` to check baseline
+5. ✅ **Plan changes**: Identify minimal changes needed
+6. ✅ **Make changes**: Follow existing patterns and conventions
+7. ✅ **Test locally**: Run relevant tests after modifications
+8. ✅ **Check quality**: Run `./gradlew lint` before committing
+9. ✅ **Update docs**: If changing public interfaces
+10. ✅ **Review**: Self-review before submitting PR
+
+### First-Time Setup
+```bash
+# Clone and navigate
+git clone https://github.com/kratos0686/Android2.0roomscanner.git
+cd Android2.0roomscanner
+
+# Setup Firebase (use example file)
+cp app/google-services.json.example app/google-services.json
+
+# Verify build works
+./gradlew build
+
+# Run tests
+./gradlew test
+```
+
+### Common Development Workflow
+```bash
+# Create feature branch
+git checkout -b feature/my-feature
+
+# Make changes, then verify
+./gradlew build test lint
+
+# Commit with conventional format
+git commit -m "feat(scope): description"
+
+# Push and create PR
+git push origin feature/my-feature
+```
+
+> 💡 **Pro Tip**: Keep changes small and focused. One issue = one PR with minimal, surgical changes.
