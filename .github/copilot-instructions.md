@@ -264,8 +264,8 @@ class ScanRepository {
         private const val DATABASE_NAME = "room_scanner.db"
     }
     
-    suspend fun insertScan(entity: ScanEntity): Long { }
-    fun getAllScans(): Flow<List<ScanEntity>> { }
+    suspend fun insertScan(entity: ScanEntity): Long = TODO()
+    fun getAllScans(): Flow<List<ScanEntity>> = TODO()
 }
 ```
 
@@ -362,8 +362,11 @@ suspend fun syncScanToCloud(scanId: Long): Result<Unit> {
 // ✅ Good: ViewModel handling Result
 viewModelScope.launch {
     repository.syncScanToCloud(scanId).fold(
-        onSuccess = { _uiState.value = UiState.Success },
-        onFailure = { _uiState.value = UiState.Error("Sync failed. Try again later.") }
+        onSuccess = { _ -> _uiState.value = UiState.Success },
+        onFailure = { error -> 
+            Log.e(TAG, "Sync failed", error)
+            _uiState.value = UiState.Error("Sync failed. Try again later.")
+        }
     )
 }
 ```
@@ -399,6 +402,9 @@ data class ScanEntity(
 interface ScanDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertScan(scan: ScanEntity): Long
+    
+    @Query("SELECT * FROM scans WHERE id = :id")
+    suspend fun getScanById(id: Long): ScanEntity?
     
     @Query("SELECT * FROM scans ORDER BY created_at DESC")
     fun getAllScans(): Flow<List<ScanEntity>>
