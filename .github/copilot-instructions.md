@@ -225,6 +225,8 @@ app/src/main/java/com/roomscanner/app/
 
 ## Code Conventions
 
+> 📝 **About Examples**: The code examples in this section demonstrate best practices and patterns for writing new code. They are instructional and may differ from existing code in the repository. When modifying existing code, follow its current patterns. When writing new code, follow these best practices.
+
 ### Kotlin Style
 - Follow official Kotlin coding conventions
 - Use Kotlin idioms (data classes, sealed classes, extension functions)
@@ -885,8 +887,8 @@ When starting a new task, follow this workflow:
 
 ### First-Time Setup
 ```bash
-# Clone and navigate
-git clone https://github.com/kratos0686/Android2.0roomscanner.git
+# Clone and navigate (assuming you have repository access)
+git clone <repository-url>
 cd Android2.0roomscanner
 
 # Setup Firebase (use example file)
