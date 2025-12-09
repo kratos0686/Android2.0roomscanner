@@ -386,7 +386,7 @@ viewModelScope.launch {
 - Use foreign key relationships where appropriate
 - Enable auto-backup in database configuration
 
-**Example:**
+**Example** (demonstrates best practices with explicit column naming):
 ```kotlin
 // ✅ Good: Entity with proper annotations
 @Entity(tableName = "scans")
@@ -410,6 +410,8 @@ interface ScanDao {
     fun getAllScans(): Flow<List<ScanEntity>>
 }
 ```
+
+> 💡 **Note**: The actual ScanEntity in this codebase uses property names directly without @ColumnInfo. The example above demonstrates explicit column naming as a best practice for new entities or when column names differ from property names.
 
 > ⚠️ **Important**: Always increment database version and provide migration when modifying entities or adding new tables.
 
@@ -526,6 +528,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 ```
+
+> 💡 **Note**: This is an illustrative example. The actual codebase already includes NoteEntity. Use this pattern when adding genuinely new entities to the database schema.
 
 ### Integrating a new ML model:
 1. Place `.tflite` model in `app/src/main/assets/`
