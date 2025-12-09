@@ -361,10 +361,10 @@ suspend fun syncScanToCloud(scanId: Long): Result<Unit> {
 
 // ✅ Good: ViewModel handling Result
 viewModelScope.launch {
-    when (val result = repository.syncScanToCloud(scanId)) {
-        is Result.Success -> _uiState.value = UiState.Success
-        is Result.Failure -> _uiState.value = UiState.Error("Sync failed. Try again later.")
-    }
+    repository.syncScanToCloud(scanId).fold(
+        onSuccess = { _uiState.value = UiState.Success },
+        onFailure = { _uiState.value = UiState.Error("Sync failed. Try again later.") }
+    )
 }
 ```
 
